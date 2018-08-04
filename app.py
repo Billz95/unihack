@@ -125,7 +125,7 @@ def get_item_by_name():
             d_item['distance'] = distance
             toRet['count']+=1
             toRet['items'].append(d_item)
-
+    toRet['items'].sort(key=lambda it: it['distance'])
 
     # toRet = {'count': items.count(),
     #          'items': [item.dictify() for item in items if
