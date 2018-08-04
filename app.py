@@ -23,6 +23,10 @@ def sql_exec(arg):
     users_conn.close()
     return data
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return "{}"
 
 """
 Create new User
@@ -150,6 +154,7 @@ def get_item_by_owner_id(id):
 
     # Add the Item into the items
     return fullResponse(R200_OK, toRet)
+
 
 if __name__ == '__main__':
     app.run()
