@@ -104,17 +104,32 @@ def get_item_by_name():
         return statusResponse(R400_BADREQUEST)
 
     item_name = request.args.get('s')
-    lon = int(request.args.get('lon'))
-    lat = int(request.args.get('lat'))
+    lon = float(request.args.get('lon'))
+    lat = float(request.args.get('lat'))
     limit = int(request.args.get('limit'))
 
     print(lon, lat)
 
     items = data.searchItemByName(item_name)
 
-    toRet = {'count': items.count(),
-             'items': [item.dictify() for item in items if
-                       calculate_distance(lon, lat, *data.findOwner(item.owner)[0].get_loc()) <= limit]}
+    toRet = {'count': 0,
+             'items': []}
+
+    for item in items:
+        owner_loc = data.findOwner(item.owner)[0].get_loc()
+        distance = calculate_distance(lon, lat, *owner_loc)
+        if (distance < limit):
+            d_item = item.dictify()
+            d_item['lon'] = owner_loc[0]
+            d_item['lat'] = owner_loc[1]
+            d_item['distance'] = distance
+            toRet['count']+=1
+            toRet['items'].append(d_item)
+
+
+    # toRet = {'count': items.count(),
+    #          'items': [item.dictify() for item in items if
+    #                    calculate_distance(lon, lat, *data.findOwner(item.owner)[0].get_loc()) <= limit]}
 
     # Add the Item into the items
     return fullResponse(R200_OK, toRet)
@@ -160,4 +175,5 @@ def get_item_by_owner_id(id):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0")
+    app.run()

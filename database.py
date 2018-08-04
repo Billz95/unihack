@@ -61,6 +61,9 @@ class Data(object):
 
     def searchItemByName(self, name):
         print("\nSearch for item: " + name + "...")
+        if name == '':
+            return []
+
         engine = create_engine('sqlite:///data.db')
         Base.metadata.bind = engine
         DBSession = sessionmaker()
