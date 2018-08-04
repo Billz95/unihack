@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from restfultool import *
+from flask_cors import CORS
 import sqlite3
 import json
 from database import *
@@ -12,6 +13,7 @@ except:
     print("Table already there!")
 
 app = Flask(__name__)
+CORS(app)
 
 
 def sql_exec(arg):
@@ -54,13 +56,14 @@ Add new item info, the user must exist
 @app.route('/api/item', methods=['POST'])
 def add_item():
     request_data = request.get_json()
-    if not all(e in request_data for e in ["username", "item_name", "item_price", "description"]):
+    if not all(e in request_data for e in ["username", "item_name", "item_price", "description", "img"]):
         return statusResponse(R400_BADREQUEST)
 
     username = request_data["username"]
     item_name = request_data["item_name"]
     item_price = float(request_data["item_price"])
     description = request_data["description"]
+    img = request_data["img"]
 
     # Check if the user exist
     owner = data.findOwner(username)
@@ -71,7 +74,7 @@ def add_item():
         return statusResponse(R404_NOTFOUND)
 
     # Add the Item into the items
-    data.insertItem(item_name, username, item_price, description)
+    data.insertItem(item_name, username, item_price, description, img)
 
     return statusResponse(R200_OK)
 
@@ -82,10 +85,10 @@ Update Item in the database
 @app.route('/api/item', methods=['PUT', 'PATCH'])
 def update_item():
     r = request.get_json()
-    if not all(e in r for e in ["id", "price", "description", "item_name", "owner_name"]):
+    if not all(e in r for e in ["id", "price", "description", "item_name", "owner_name", "img"]):
         return statusResponse(R400_BADREQUEST)
 
-    data.updateItem(int(r['id']), r['item_name'], r['owner_name'], r['price'], r['description'])
+    data.updateItem(int(r['id']), r['item_name'], r['owner_name'], r['price'], r['description'], r["img"])
 
     # Add the Item into the items
     return statusResponse(R200_OK)
@@ -157,4 +160,4 @@ def get_item_by_owner_id(id):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0")

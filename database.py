@@ -15,6 +15,7 @@ class Product(Base):
     owner = Column(String)
     price = Column(REAL)
     description = Column(String)
+    img = Column(String)
 
     def dictify(self):
         return {
@@ -22,7 +23,9 @@ class Product(Base):
             'name': self.name,
             'owner': self.owner,
             'price':self.price,
-            'description':self.description}
+            'description':self.description,
+            'img' : self.img
+        }
 
 
 class Owner(Base):
@@ -44,13 +47,13 @@ class Data(object):
         engine = create_engine('sqlite:///data.db')
         Base.metadata.create_all(engine)
 
-    def insertItem(self, name, owner, price, description):
+    def insertItem(self, name, owner, price, description, img):
         engine = create_engine('sqlite:///data.db')
         Base.metadata.bind = engine
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
 
-        product = Product(name=name, owner=owner, price=price, description=description)
+        product = Product(name=name, owner=owner, price=price, description=description, img=img)
         session.add(product)
 
         session.commit()
@@ -140,14 +143,14 @@ class Data(object):
         session.close()
         return owners
 
-    def updateItem(self, id, name, owner_name, price, description):
+    def updateItem(self, id, name, owner_name, price, description, img):
         engine = create_engine('sqlite:///data.db')
         Base.metadata.bind = engine
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
 
         session.query(Product).filter_by(id=id).update(
-            {'name': name, 'price': price, 'owner':owner_name, 'description': description})
+            {'name': name, 'price': price, 'owner':owner_name, 'description': description, 'img':img})
 
         session.commit()
         session.close()
