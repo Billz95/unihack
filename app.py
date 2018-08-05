@@ -140,8 +140,16 @@ Find the requested item with the specified id
 """
 @app.route('/api/item/id/<int:item_id>', methods=['GET'])
 def get_item_by_id(item_id):
-    items = data.searchItemById(item_id)
-    toRet = {'count': items.count(), 'items': [item.dictify() for item in items]}
+    item = data.searchItemById(item_id)[0]
+    owner = data.findOwner(item)[0]
+    item_d = item.dictify()
+    lat = owner.lat
+    lon = owner.lon
+    item_d['lon'] = owner.lon
+    item_d['lat'] = owner.lat
+    item_d['distance'] = calculate_distance(lon, lat, owner.lon, owner.lat)
+
+    toRet = {'count': 1, 'items': item_d}
     # Add the Item into the items
     return fullResponse(R200_OK, toRet)
 
